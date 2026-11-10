@@ -2,9 +2,9 @@
 RECORD CHECK  -  my version
 ===========================
 
-Name  :
-Lane  :  AI / Cyber / IT      (delete two)
-Date  :
+Name  : Jemel
+Lane  :   Cyber
+Date  : 29.10.2026
 
 Run it:   python template.py
 
@@ -12,43 +12,77 @@ Work through the numbered sections in order. Each one tells you what it must do.
 Delete these instructions as you replace them with your code.
 """
 
-# =================================================================== FUNCTIONS
-# 1. Bring back check_record(value, limit) and print_report(...) from Week 3
-#    (copy them, or rewrite them - either is fine). check_record returns
-#    difference, percent and status. print_report does all of the printing,
-#    nothing outside it should contain a print() of its own. Give each a
-#    one-line docstring.
-
-# your function(s) go here
-
-
-# ====================================================================== STORE
-# 2. Get your records into a list of dicts, each shaped like:
-#        {"label": ..., "value": ..., "limit": ...}
-#
-#    Threshold : write the list directly in the code - at least 3 records.
-#    Typical   : instead, write a function load_records(path) that reads
-#                label,value,limit lines from a file and returns the list.
-#                Make your own data file, one record per line.
-#    Excellent : also write the results out to a new file (one line per
-#                record: label, status), as well as printing them.
-
-records = []   # replace with your code
+def check_record(value, limit):
+    """Calculates the difference, percentage, and breach status for a record."""
+    difference = limit - value
+    percent = (value / limit) * 100
+    
+    if value > limit:
+        status = "OVER LIMIT"
+    else:
+        status = "OK"
+        
+    return difference, percent, status
 
 
-# =============================================================== PROCESS + OUTPUT
+def check_record(value, limit):
+    """Calculates the difference, percentage, and breach status for a record."""
+    difference = limit - value
+    percent = (value / limit) * 100
+    
+    if value > limit:
+        status = "OVER LIMIT"
+    else:
+        status = "OK"
+        
+    return difference, percent, status
+
+
+def print_report(label, value, limit, difference, percent, status):
+    """Formats and prints the report details for a single record on one line."""
+    print(f"{label:<12} | Value: {value:<5} | Limit: {limit:<5} | Diff: {difference:<5} | {percent:>5.1f}% | Status: {status}")
+
+
+def load_records(path):
+    """Reads label, value, limit lines from a file and returns a list of dicts."""
+    records_list = []
+    with open(path, 'r') as file:
+        for line in file:
+            cleaned_line = line.strip()
+            if not cleaned_line:
+                continue  # Skip empty lines
+                
+            parts = cleaned_line.split(',')
+            if len(parts) == 3:
+                # We use pop(0) to cleanly extract each item one after the other
+                item_label = parts.pop(0).strip()
+                item_value = int(parts.pop(0).strip())
+                item_limit = int(parts.pop(0).strip())
+                
+                records_list.append({
+                    "label": item_label,
+                    "value": item_value,
+                    "limit": item_limit
+                })
+    return records_list
+
+
+# ======================================================================= STORE
+
+# Make a file called records.txt in your folder containing data like:
+#10.0.0.5,85,100
+#7.0.3.4,120,100
+#10.1.2.0,45,100
+
+records = load_records('Week 04 - Lists, Dictionaries and Files/LAB/records.txt')
+
+
+# ======================================================================= PROCESS + OUTPUT
+
 # 3. Loop over records. For each one, call check_record and print_report.
-#
-#    Excellent : also keep a running count of how many were OVER LIMIT, and
-#                print that once, after the loop ends.
-
-# your loop goes here
-
-
-# ==========================================================================
-# 4. Before you finish:
-#
-#    [ ] Run it and check every record's numbers are correct by hand
-#    [ ] If you are loading from a file, check what happens when the file
-#        does not exist - write the error down
-#    [ ] Check every function still does one job
+for rec in records:
+    # Unpack calculations
+    diff, pct, stat = check_record(rec["value"], rec["limit"])
+    
+    # Send all details to print_report
+    print_report(rec["label"], rec["value"], rec["limit"], diff, pct, stat)
